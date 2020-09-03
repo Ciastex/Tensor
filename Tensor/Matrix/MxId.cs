@@ -12,7 +12,7 @@ namespace Tensor.Matrix
 
         static MxId()
         {
-            _uidValidationRegex = new Regex(@"\@(?<username>[a-z0-9\._=-/]+)\:(?<server>.+)");
+            _uidValidationRegex = new Regex(@"\@(?<username>[a-z0-9\._\=\-\/]+)\:(?<server>.+)");
         }
 
         public MxId(string username, string server)
