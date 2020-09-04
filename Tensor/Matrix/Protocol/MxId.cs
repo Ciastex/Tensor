@@ -1,11 +1,12 @@
 using System;
+using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Tensor.Matrix
+namespace Tensor.Matrix.Protocol
 {
     public class MxId
     {
-        private static Regex _uidValidationRegex;
+        private static readonly Regex _uidValidationRegex;
 
         public string Username { get; }
         public string Server { get; }
@@ -19,6 +20,18 @@ namespace Tensor.Matrix
         {
             Username = username;
             Server = server;
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            sb.Append('@');
+            sb.Append(Username);
+            sb.Append(':');
+            sb.Append(Server);
+
+            return sb.ToString();
         }
 
         public static MxId Parse(string mxidString)

@@ -10,7 +10,7 @@ using Tensor.Matrix.Protocol;
 
 namespace Tensor.Rest
 {
-    internal class Request
+    public class Request
     {
         protected List<int> IgnoredStatusCodes { get; private set; } = new List<int>();
 
@@ -18,9 +18,10 @@ namespace Tensor.Rest
             new Dictionary<int, Action<RestRequest, IRestResponse, Error>>();
 
         protected RestClient RestClient { get; private set; }
-        protected string Endpoint { get; private set; }
-        protected Method Method { get; private set; }
+        protected string Endpoint { get; }
+        protected Method Method { get; }
         protected object Body { get; private set; }
+        protected bool IsNoisy { get; private set; }
 
         protected Delegate SuccessDelegate { get; private set; }
 
@@ -64,6 +65,12 @@ namespace Tensor.Rest
             return this;
         }
 
+        public Request Noisy()
+        {
+            IsNoisy = true;
+            return this;
+        }
+
         public async Task<T> Execute<T>(RestRequest customRestRequest = null)
         {
             var request = customRestRequest ?? new RestRequest(Method);
@@ -72,15 +79,24 @@ namespace Tensor.Rest
 
             if (Body != null)
             {
-                request.AddParameter("application/json", JsonConvert.SerializeObject(Body), ParameterType.RequestBody);
+                var json = JsonConvert.SerializeObject(Body);
+
+                if (IsNoisy) Console.WriteLine($"|> OUT ==> {json}");
+
+                request.AddParameter("application/json", json, ParameterType.RequestBody);
             }
 
-            var response = await RestClient.ExecuteAsync<T>(request);
-            
+
+            var response = await RestClient.ExecuteAsync(request);
+
+            if (IsNoisy) Console.WriteLine($"<== IN <| {response.Content}");
+
+            var data = JsonConvert.DeserializeObject<T>(response.Content);
+
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 var action = SuccessDelegate as Action<T>;
-                action?.Invoke(response.Data);
+                action?.Invoke(data);
             }
             else
             {
@@ -110,7 +126,7 @@ namespace Tensor.Rest
                 }
             }
 
-            return response.Data;
+            return data;
         }
 
         private bool IsIgnored(HttpStatusCode code)

@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using RestSharp;
+﻿using RestSharp;
 
 namespace Tensor.Rest
 {
-    internal sealed class Get : Request
+    public sealed class Get : Request
     {
-        private Get(string endpoint) : base(endpoint, Method.GET) { }
-        
+        private Get(string endpoint) : base(endpoint, Method.GET)
+        {
+        }
+
         public static Get To(string endpoint)
-            => new Get(endpoint);
+        {
+            return new Get(endpoint);
+        }
     }
 }

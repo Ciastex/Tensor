@@ -6,7 +6,7 @@ namespace Tensor.Matrix.Client
     {
         [JsonProperty("type")]
         public string Type { get; set; }
-        
+
         [JsonProperty("session")]
         public string SessionKey { get; set; }
     }
